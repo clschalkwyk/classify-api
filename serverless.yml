@@ -1,0 +1,46 @@
+service: classify-api
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: af-south-1
+  stage: ${opt:stage, 'dev'}
+  profile: classifydepl
+  environment:
+    CLASSIFY_TABLE: ${self:custom.ClassifyTable.name}
+  iamRoleStatements:
+    - ${file(iam/ClassifyTableIAM.yml):ClassifyTableIAM}
+
+plugins:
+  - serverless-offline
+
+package:
+  exclude:
+    - .git/**
+    - src/**
+    - test/**
+    - e2e/**
+    - nodemon.json
+    - README.md
+
+resources:
+  Resources:
+    ClassifyTable: ${file(resources/ClassifyTable.yml):ClassifyTable}
+
+functions:
+  index:
+    handler: dist/index.handler
+    events:
+    - http:
+        cors: true
+        path: '/'
+        method: any
+    - http:
+        cors: true
+        path: '{proxy+}'
+        method: any
+
+custom:
+  ClassifyTable:
+    arn: !GetAtt ClassifyTable.Arn
+    name: !Ref ClassifyTable
