@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const local_auth_guard_1 = require("./local-auth.guard");
 const jwt_auth_guard_1 = require("./jwt-auth.guard");
+const createUser_dto_1 = require("./dto/createUser.dto");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -26,6 +27,22 @@ let AuthController = class AuthController {
     }
     getProfile(req) {
         return req.user;
+    }
+    async signup(createUserDto, res) {
+        try {
+            if (!(await this.authService.userExists(createUserDto.email))) {
+                const newUser = await this.authService.createUser(createUserDto);
+                return res.status(common_1.HttpStatus.OK).json({ ok: true });
+            }
+            return res.status(common_1.HttpStatus.INTERNAL_SERVER_ERROR).json({ ok: false, message: 'User exists' });
+        }
+        catch (e) {
+            return res.status(common_1.HttpStatus.INTERNAL_SERVER_ERROR).json({
+                ok: false,
+                message: 'Error db',
+                error: e
+            });
+        }
     }
 };
 __decorate([
@@ -44,6 +61,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "getProfile", null);
+__decorate([
+    common_1.Post('signup'),
+    __param(0, common_1.Body()), __param(1, common_1.Res()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [createUser_dto_1.CreateUserDto, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "signup", null);
 AuthController = __decorate([
     common_1.Controller('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

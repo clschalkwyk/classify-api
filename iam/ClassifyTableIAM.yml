@@ -8,3 +8,4 @@ ClassifyTableIAM:
     - dynamodb:Query
   Resource:
     - ${self:custom.ClassifyTable.arn}
+    - !Join ['/', ['${self:custom.ClassifyTable.arn}', 'index', 'emailIdx']]

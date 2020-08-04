@@ -1,4 +1,5 @@
 import { AuthService } from "./auth.service";
+import { CreateUserDto } from "./dto/createUser.dto";
 export declare class AuthController {
     private authService;
     constructor(authService: AuthService);
@@ -6,4 +7,5 @@ export declare class AuthController {
         access_token: string;
     }>;
     getProfile(req: any): any;
+    signup(createUserDto: CreateUserDto, res: any): Promise<any>;
 }

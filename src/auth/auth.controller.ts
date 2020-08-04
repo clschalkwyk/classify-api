@@ -1,7 +1,8 @@
-import {Controller, UseGuards, Post, Get, Request} from '@nestjs/common';
+import {Controller, UseGuards, Post, Get,Body, Request, Res, HttpStatus} from '@nestjs/common';
 import {AuthService} from "./auth.service";
 import {LocalAuthGuard} from "./local-auth.guard";
 import {JwtAuthGuard} from "./jwt-auth.guard";
+import {CreateUserDto} from "./dto/createUser.dto";
 
 @Controller('auth')
 export class AuthController {
@@ -19,4 +20,20 @@ export class AuthController {
         return req.user
     }
 
+    @Post('signup')
+    async signup(@Body() createUserDto: CreateUserDto, @Res() res:any){
+        try{
+            if(!(await this.authService.userExists(createUserDto.email))){
+                const newUser = await this.authService.createUser(createUserDto);
+                return res.status(HttpStatus.OK).json({ok: true});
+            }
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ok: false, message: 'User exists'});
+        }catch (e) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                ok:false,
+                message: 'Error db',
+                error: e
+            });
+        }
+    }
 }
