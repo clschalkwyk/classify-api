@@ -10,6 +10,14 @@ ClassifyTable:
         AttributeType: S
       - AttributeName: email
         AttributeType: S
+      - AttributeName: compKeyLocation
+        AttributeType: S
+      - AttributeName: group
+        AttributeType: S
+      - AttributeName: compKeyType
+        AttributeType: S
+      - AttributeName: userId
+        AttributeType: S
     KeySchema:
       - AttributeName: pk
         KeyType: HASH
@@ -21,6 +29,30 @@ ClassifyTable:
           - AttributeName: email
             KeyType: HASH
           - AttributeName: sk
+            KeyType: RANGE
+        Projection:
+          ProjectionType: ALL
+      - IndexName: compKeyLocationIdx
+        KeySchema:
+          - AttributeName: group
+            KeyType: HASH
+          - AttributeName: compKeyLocation
+            KeyType: RANGE
+        Projection:
+          ProjectionType: ALL
+      - IndexName: compKeyTypeIdx
+        KeySchema:
+          - AttributeName: group
+            KeyType: HASH
+          - AttributeName: compKeyType
+            KeyType: RANGE
+        Projection:
+          ProjectionType: ALL
+      - IndexName: userContentIdx
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: compKeyType
             KeyType: RANGE
         Projection:
           ProjectionType: ALL

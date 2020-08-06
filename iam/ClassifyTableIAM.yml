@@ -9,3 +9,6 @@ ClassifyTableIAM:
   Resource:
     - ${self:custom.ClassifyTable.arn}
     - !Join ['/', ['${self:custom.ClassifyTable.arn}', 'index', 'emailIdx']]
+    - !Join ['/', ['${self:custom.ClassifyTable.arn}', 'index', 'compKeyLocationIdx']]
+    - !Join ['/', ['${self:custom.ClassifyTable.arn}', 'index', 'compKeyTypeIdx']]
+    - !Join ['/', ['${self:custom.ClassifyTable.arn}', 'index', 'userContentIdx']]
