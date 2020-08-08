@@ -3416,8 +3416,13 @@
         "signature": "1b8e2370aa2872687e7ab84dcf4c565ad5515b28c098b11d68a2d67d5e51095f",
         "affectsGlobalScope": false
       },
+      "../src/lib/Crypt.ts": {
+        "version": "f30957ec9139a5c70079e56b2539bfae9768e73109b56f5338cd54315dd612a8",
+        "signature": "572fd98f6f559b2e6d6c6e585a31a8bdfd788074c9ba65c710a52409d6d1bbf1",
+        "affectsGlobalScope": false
+      },
       "../src/auth/auth.service.ts": {
-        "version": "8c3f1a5cedb4b3b4a2c55f773ab31a4ca01a18d533f63eec5f59ec417a2637c5",
+        "version": "2902bd542893c514eb8d4aa1d21636cbcf6d83f50f68c233a273cabb2bdbfbef",
         "signature": "a55cbc464b71a4c56ab7405b3375db9a570accb4fbd27b1f675e4d78cfcf175b",
         "affectsGlobalScope": false
       },
@@ -3562,13 +3567,18 @@
         "affectsGlobalScope": false
       },
       "../src/auth/auth.module.ts": {
-        "version": "78624f1d17ae886b88ec3d5192be2dae0ea19e98c8a4d1b6d26837e55dc9c170",
+        "version": "3a62ec1354c7084fe8416dd722c099d0ab087a39b0033373e4c632897524a4d1",
         "signature": "a28b5c0c372fb375910b3fe3c3ce4331509bc18ccef7cc39c9ee9d8daf8225d1",
         "affectsGlobalScope": false
       },
+      "../src/user/dto/updateUser.dto.ts": {
+        "version": "a91e9d136eafcdc87aa4701ee0f156a48f23c6ebb98440bf9bf1af9e8f41ab62",
+        "signature": "40ec4ecd4886dd80605ecb14833fc814db23088c4167594f00863d20329ac78e",
+        "affectsGlobalScope": false
+      },
       "../src/user/user.service.ts": {
-        "version": "230ca661961fc66c122621883c098d2b1e1b3bbb212eef1f23df18203f50a490",
-        "signature": "87766d73d7dbeee6ba94874f66534c261407facf6ed49d8f080f095f52366e9d",
+        "version": "4e2a050d43a4698bac546f66c82408a476264d7e9a9f4656ae3e846fe6db92eb",
+        "signature": "2c7192b6226af3d5ac87555315fbe5463178e1e693b3a7cd7b22806c924deabb",
         "affectsGlobalScope": false
       },
       "../src/advert/dto/newAdvert.dto.ts": {
@@ -3577,13 +3587,13 @@
         "affectsGlobalScope": false
       },
       "../src/advert/advert.service.ts": {
-        "version": "a43906bcf9379eb2e624df1305bca59a606d8c64110b8679b964dcac007a1604",
-        "signature": "2ac74638d8b7a48faa7cf9f03425559c192b77af837dbb9c92ff3970f4896c98",
+        "version": "57b10e087621ba183088011cb29c721a471c0050310fd6540669fe6e9593aeb0",
+        "signature": "b8c20bc85e54fd6869416f7647eae112c43d1a9a1e76c545b3e3b2b9b73df57b",
         "affectsGlobalScope": false
       },
       "../src/advert/advert.controller.ts": {
-        "version": "aaa59a0f3af927d50a123611b20f312a120ddd078fdf6d9e0c783ed128627d68",
-        "signature": "a8d2eccea5e0e6fb98ac8ad0e49b5fb98ad6e2b6a0a27e2d52508edd1838a666",
+        "version": "ca5118165fb92f6c81de89a6b7da6e4e251c644fa32f883da2d129dc0a3bb62a",
+        "signature": "363198ff47ab4ccdc88cb29bef4b16c71e06a2f0bc065434fcfc7a10989b4b90",
         "affectsGlobalScope": false
       },
       "../src/advert/advert.module.ts": {
@@ -3591,8 +3601,18 @@
         "signature": "24cff15f3641d1114a7eaaf1d8b7978af9c80ef62c0929510b90e4e0463ea84d",
         "affectsGlobalScope": false
       },
+      "../src/user/user.controller.ts": {
+        "version": "865b04b98265341ffd18c23d9fc6a4193ccf40020253d29e97b190d9b5755f9b",
+        "signature": "82bfe88a3b4f3ee57e53957e8f0ab15166a5d7d0ce1bd4d72704a54f0cc68eb5",
+        "affectsGlobalScope": false
+      },
+      "../src/user/user.module.ts": {
+        "version": "e7e41f456f096e5c5c4f3511988136877d1904c2eb7cb8ad9def7a166771802a",
+        "signature": "482b8f0d35a3d453500a15b6c6057c1e4c40baa4329b39da9e1026d8e1de4329",
+        "affectsGlobalScope": false
+      },
       "../src/app.module.ts": {
-        "version": "73c8abbe9ac4d7520ddaf363485f961581d9e054b093f00a92b72da6d638649c",
+        "version": "f02e1cc0d8510dd6701b1e9e8af34d64da6e4e1ed2da4e3156a895ee64363199",
         "signature": "b82491e2990291580288c5602d4c017238977749d52b17391f0e45d9a29be644",
         "affectsGlobalScope": false
       },
@@ -13171,6 +13191,7 @@
         "../src/app.controller.ts",
         "../src/app.service.ts",
         "../src/auth/auth.module.ts",
+        "../src/user/user.module.ts",
         "../src/user/user.service.ts"
       ],
       "../src/app.service.ts": [
@@ -13212,13 +13233,13 @@
         "../node_modules/@nestjs/common/index.d.ts",
         "../node_modules/@nestjs/jwt/index.d.ts",
         "../node_modules/@types/graceful-fs/index.d.ts",
-        "../node_modules/@types/node/crypto.d.ts",
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/aws-sdk/index.d.ts",
-        "../src/auth/dto/createUser.dto.ts"
+        "../src/auth/dto/createUser.dto.ts",
+        "../src/lib/Crypt.ts"
       ],
       "../src/auth/constants.ts": [
         "../node_modules/@types/graceful-fs/index.d.ts",
@@ -13288,6 +13309,14 @@
         "../node_modules/@types/node/util.d.ts",
         "../src/app.module.ts"
       ],
+      "../src/lib/Crypt.ts": [
+        "../node_modules/@types/graceful-fs/index.d.ts",
+        "../node_modules/@types/node/crypto.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts"
+      ],
       "../src/main.ts": [
         "../node_modules/@nestjs/core/index.d.ts",
         "../node_modules/@types/graceful-fs/index.d.ts",
@@ -13307,13 +13336,47 @@
         "../node_modules/@types/node/util.d.ts",
         "../src/app.module.ts"
       ],
+      "../src/user/dto/updateUser.dto.ts": [
+        "../node_modules/@types/graceful-fs/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts"
+      ],
+      "../src/user/user.controller.ts": [
+        "../node_modules/@nestjs/common/index.d.ts",
+        "../node_modules/@types/graceful-fs/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../src/auth/jwt-auth.guard.ts",
+        "../src/user/dto/updateUser.dto.ts",
+        "../src/user/user.service.ts"
+      ],
+      "../src/user/user.module.ts": [
+        "../node_modules/@nestjs/common/index.d.ts",
+        "../node_modules/@nestjs/jwt/index.d.ts",
+        "../node_modules/@types/graceful-fs/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../src/auth/auth.service.ts",
+        "../src/auth/jwt.strategy.ts",
+        "../src/user/user.controller.ts",
+        "../src/user/user.service.ts"
+      ],
       "../src/user/user.service.ts": [
         "../node_modules/@nestjs/common/index.d.ts",
         "../node_modules/@types/graceful-fs/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/util.d.ts"
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/aws-sdk/index.d.ts",
+        "../src/lib/Crypt.ts",
+        "../src/user/dto/updateUser.dto.ts"
       ]
     },
     "exportedModulesMap": {
@@ -22000,6 +22063,7 @@
         "../src/advert/dto/newAdvert.dto.ts"
       ],
       "../src/advert/advert.service.ts": [
+        "../node_modules/aws-sdk/index.d.ts",
         "../src/advert/dto/newAdvert.dto.ts"
       ],
       "../src/app.controller.ts": [
@@ -22028,6 +22092,15 @@
       ],
       "../src/index.ts": [
         "../node_modules/@types/aws-lambda/index.d.ts"
+      ],
+      "../src/user/user.controller.ts": [
+        "../src/user/dto/updateUser.dto.ts",
+        "../src/user/user.service.ts"
+      ],
+      "../src/user/user.service.ts": [
+        "../node_modules/aws-sdk/index.d.ts",
+        "../node_modules/aws-sdk/lib/request.d.ts",
+        "../src/user/dto/updateUser.dto.ts"
       ]
     },
     "semanticDiagnosticsPerFile": []

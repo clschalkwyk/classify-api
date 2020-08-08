@@ -12,25 +12,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
-const crypto_1 = require("crypto");
-const util_1 = require("util");
 const AWS = require("aws-sdk");
 const uuid_1 = require("uuid");
-const scryptAsync = util_1.promisify(crypto_1.scrypt);
+const Crypt_1 = require("../lib/Crypt");
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 let AuthService = class AuthService {
     constructor(jwtService) {
         this.jwtService = jwtService;
     }
     async toHash(password) {
-        const salt = crypto_1.randomBytes(16).toString('hex');
-        const buf = (await scryptAsync(password, salt, 64));
-        return `${buf.toString('hex')}.${salt}`;
+        const hashed = await Crypt_1.toHash(password);
+        return hashed;
     }
     async compare(storedPassword, suppliedPassword) {
-        const [hashedPassword, salt] = storedPassword.split('.');
-        const buf = (await scryptAsync(suppliedPassword, salt, 64));
-        return buf.toString('hex') === hashedPassword;
+        const res = await Crypt_1.compare(storedPassword, suppliedPassword);
+        return res;
     }
     async validateUser(email, pass) {
         const result = await dynamodb.query({

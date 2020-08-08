@@ -1,12 +1,14 @@
 import {Injectable, InternalServerErrorException} from '@nestjs/common';
 import {JwtService} from "@nestjs/jwt";
-import {scrypt, randomBytes} from "crypto";
+//import {scrypt, randomBytes} from "crypto";
 import {promisify} from "util";
 import {CreateUserDto} from "./dto/createUser.dto";
 import * as AWS from 'aws-sdk';
 import {v4 as uuidv4} from 'uuid';
+import {toHash as toHashCrypt, compare as compareCrypt} from "../lib/Crypt";
 
-const scryptAsync = promisify(scrypt);
+//const scryptAsync = promisify(scrypt);
+
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
@@ -18,17 +20,17 @@ export class AuthService {
     }
 
     async toHash(password: string) {
-        const salt = randomBytes(16).toString('hex');
-        const buf = (await scryptAsync(password, salt, 64)) as Buffer;
-
-        return `${buf.toString('hex')}.${salt}`;
+        // const salt = randomBytes(16).toString('hex');
+        // const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+        const hashed = await toHashCrypt(password);
+        return hashed;
     }
 
     async compare(storedPassword: string, suppliedPassword: string) {
-        const [hashedPassword, salt] = storedPassword.split('.');
-        const buf = (await scryptAsync(suppliedPassword, salt, 64)) as Buffer;
-
-        return buf.toString('hex') === hashedPassword;
+//        const [hashedPassword, salt] = storedPassword.split('.');
+  //      const buf = (await scryptAsync(suppliedPassword, salt, 64)) as Buffer;
+        const res = await compareCrypt(storedPassword, suppliedPassword);
+        return res;
     }
 
     async validateUser(email: string, pass: string): Promise<any> {

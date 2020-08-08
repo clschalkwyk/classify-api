@@ -15,11 +15,12 @@ const user_service_1 = require("./user/user.service");
 const advert_service_1 = require("./advert/advert.service");
 const advert_controller_1 = require("./advert/advert.controller");
 const advert_module_1 = require("./advert/advert.module");
+const user_module_1 = require("./user/user.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     common_1.Module({
-        imports: [auth_module_1.AuthModule, advert_module_1.AdvertModule],
+        imports: [auth_module_1.AuthModule, advert_module_1.AdvertModule, user_module_1.UserModule],
         controllers: [app_controller_1.AppController, advert_controller_1.AdvertController],
         providers: [app_service_1.AppService, user_service_1.UserService, advert_service_1.AdvertService],
     })
