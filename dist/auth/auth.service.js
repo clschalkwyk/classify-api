@@ -49,9 +49,8 @@ let AuthService = class AuthService {
     }
     async login(user) {
         const payload = { email: user.email, sub: user.sub };
-        return {
-            access_token: this.jwtService.sign(payload)
-        };
+        console.log("login:", payload);
+        return this.jwtService.sign(payload);
     }
     async userExists(email) {
         try {

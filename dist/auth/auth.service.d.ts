@@ -6,9 +6,7 @@ export declare class AuthService {
     toHash(password: string): Promise<string>;
     compare(storedPassword: string, suppliedPassword: string): Promise<boolean>;
     validateUser(email: string, pass: string): Promise<any>;
-    login(user: any): Promise<{
-        access_token: string;
-    }>;
+    login(user: any): Promise<string>;
     userExists(email: string): Promise<boolean>;
     createUser(createUserDto: CreateUserDto): Promise<void>;
 }

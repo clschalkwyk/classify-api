@@ -1,0 +1,74 @@
+{
+    "user": {
+        "id": "",
+        "firstname": "",
+        "lastname": "",
+        "email": "",
+        "createdAt": "",
+        "updatedAt": "",
+        "authId": "",
+        "newsletter": ""
+    },
+    "auth":{
+        "id" : "",
+        "email" : "",
+        "password" : "",
+        "createdAt" : ""
+    },
+    "catalog#property":{
+        "id": "",
+        "type" : "property",
+        "title": "",
+        "description": "",	
+        "images": "",	
+        "createdAt": "",
+        "expiredAt": "",
+        "published": "",
+        "stats": {
+            "Count":{},
+            "Has":{},
+            "Size":{}
+        },
+        "ratesTaxes": "",
+        "askingPrice": "",
+        "rentalAmount":"",
+        "propertyType": "",
+        "geoLocation": {
+            "lat" :"",
+            "lon" : ""
+        },
+        "user_id": "",
+        "fullAddress": {
+            "buildingName":"",
+            "complexName":"",
+            "street1":"",
+            "street2":"",
+            "suburb":"",
+            "postcode":"",
+            "city":"",
+            "province":"",
+            "country":""
+        }
+    },
+    "geoLocation":{
+        "lat" :"",
+        "lon" : ""
+    },
+    "fullAddress":{
+        "buildingName":"",
+        "complexName":"",
+        "street1":"",
+        "street2":"",
+        "suburb":"",
+        "postcode":"",
+        "city":"",
+        "province":"",
+        "country":""
+    },
+    "propertyStats":{
+        "Count": ["bedrooms","bathrooms","lounges","kitchen","garage","parking_bays"],
+        "Has": ["pool","patio","storage","laundry","scullery","guest_toilet","entrance_hall","alarm","access_gate","electric_fencing","intercom","guard_house","pet_friendly","sea_view","flatlet"],
+        "Size": ["erf_size","floor_area"]
+    }
+   
+}

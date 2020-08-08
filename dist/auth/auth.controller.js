@@ -22,8 +22,13 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    async login(req) {
-        return this.authService.login(req.user);
+    async login(req, res) {
+        const token = await this.authService.login(req.user);
+        res.cookie("token", token, {
+            domain: null,
+            httpOnly: true
+        });
+        return res.status(common_1.HttpStatus.OK).json({ access_token: token });
     }
     getProfile(req) {
         return req.user;
@@ -48,9 +53,9 @@ let AuthController = class AuthController {
 __decorate([
     common_1.UseGuards(local_auth_guard_1.LocalAuthGuard),
     common_1.Post('login'),
-    __param(0, common_1.Request()),
+    __param(0, common_1.Request()), __param(1, common_1.Res()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([
