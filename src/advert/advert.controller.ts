@@ -1,7 +1,9 @@
-import {Controller, UseGuards, Post, Get, Body, Request, Param, Res, HttpStatus} from '@nestjs/common';
+import {Controller, UseGuards, Post, Get, Body, Request, Param, Res, HttpStatus, UseInterceptors, UploadedFile} from '@nestjs/common';
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {AdvertService} from "./advert.service";
 import {NewAdvertDto} from "./dto/newAdvert.dto";
+import {FileInterceptor} from "@nestjs/platform-express";
+import {NewImageDto} from "./dto/newImage.dto";
 
 @Controller('advert')
 export class AdvertController {
@@ -14,6 +16,29 @@ export class AdvertController {
         const newAdvert = await this.advertService.createAd(createAdDto, req.user);
         return res.status(HttpStatus.OK).json(newAdvert);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('indexAdvert')
+    async indexAdvert(@Body() createAdDto: NewAdvertDto, @Request() req, @Res() res: any){
+        console.log("INDEX DOC");
+        const newAdvert = await this.advertService.indexAdvert(createAdDto, req.user);
+        return res.status(HttpStatus.OK).json(newAdvert);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileInterceptor('advertImg' ))
+    @Post('addImage/:tmpId')
+    async addImage(@Body() body: any,
+                   @Param('tmpId') tmpId: string,
+                   @Request() req,
+                   @Res() res: any,
+                   @UploadedFile() advertImg: Express.Multer.File){
+
+        console.log("ADD IMAGE");
+        const newAdvert = await this.advertService.addImage(advertImg, tmpId, req.user, req, res);
+        return res.status(HttpStatus.OK).json({ok: true});
+    }
+
 
     @UseGuards(JwtAuthGuard)
     @Get('my-ads')

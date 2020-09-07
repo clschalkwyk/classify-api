@@ -7,12 +7,10 @@ import {MessagesService} from "./messages.service";
 export class MessagesController {
   constructor(private messageService : MessagesService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Post('new-message')
   async newMessage(@Body() newMessage: NewMessageDto, @Request() req, @Res() res){
-     const result = await this.messageService.newMessage(newMessage, req.user.id );
+     const result = await this.messageService.newMessage(newMessage, req.user?.id );
      return res.status(HttpStatus.ACCEPTED).json(result);
   }
-
 
 }

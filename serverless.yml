@@ -8,8 +8,10 @@ provider:
   profile: classifydepl
   environment:
     CLASSIFY_TABLE: ${self:custom.ClassifyTable.name}
+    CLASSIFY_S3: ${self:custom.ClassifyS3.name}
   iamRoleStatements:
     - ${file(iam/ClassifyTableIAM.yml):ClassifyTableIAM}
+    - ${file(iam/ClassifyS3IAM.yml):ClassifyS3IAM}
 
 plugins:
   - serverless-offline
@@ -26,6 +28,7 @@ package:
 resources:
   Resources:
     ClassifyTable: ${file(resources/ClassifyTable.yml):ClassifyTable}
+    AttachmentsBucket: ${file(resources/ClassifyS3Bucket.yml):AttachmentsBucket}
 
 functions:
   index:
@@ -44,3 +47,6 @@ custom:
   ClassifyTable:
     arn: !GetAtt ClassifyTable.Arn
     name: !Ref ClassifyTable
+  ClassifyS3:
+    arn: !GetAtt AttachmentsBucket.Arn
+    name: !Ref AttachmentsBucket
