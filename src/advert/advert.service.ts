@@ -12,7 +12,6 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 // const s3bucket = 'classify-api-dev-attachmentsbucket-hyqj0x8gcafv';
 const s3bucket = process.env.CLASSIFY_S3;
 const tmpDir = 'temp';
-
 const s3 = new AWS.S3();
 
 
@@ -24,50 +23,18 @@ export class AdvertService {
 
   currentTempId = '';
 
-  async addImage(advertImg: Express.Multer.File, tmpId: string, user: any, @Req() req,  @Res() res) {
-    console.log("IMAGE tmpId", tmpId);
-    console.log("IMAGE req", req);
-    console.log("IMAGE filename", advertImg.originalname);
-    console.log("IMAGE USER", user);
-    const key: string = [tmpDir, tmpId, advertImg.originalname].join("/");
-    this.currentTempId = tmpId;
+  async addImage(advertImg: Express.Multer.File, tmpId: string, user: any, @Req() req, @Res() res, body: any) {
 
-    const params = {
-      Body: advertImg.buffer,
+    const key: string = [tmpDir, tmpId, body.originalname].join("/");
+    const resUpload = await s3.putObject({
       Bucket: s3bucket,
-      ContentType: advertImg.mimetype,
-      Key: key
-    };
+      Key: key,
+      Body: new Buffer(body.advertImg, 'base64')
+    }).promise();
 
-    console.log(params);
-
-    try{
-      this.upload(req, res, (error) => {
-        if(error){
-          console.log(error);
-          return false;
-        }
-        console.log(req);
-        return req.file.location;
-      });
-    }catch (error){
-      console.log(error);
-      return false;
-    }
+    return resUpload;
   }
 
-  upload = multer({
-    storage : multers3({
-      s3: s3,
-      bucket: s3bucket,
-      acl: 'public-read',
-      key: (req, file, cb) => {
-        const nf = [tmpDir, this.currentTempId, file.originalname].join("/");
-        console.log('NF : ', nf);
-        cb(null, nf);
-      }
-    })
-  }).any();
 
   async indexAdvert(newAd: NewAdvertDto, user: any) {
     console.log("TO ES", newAd);
