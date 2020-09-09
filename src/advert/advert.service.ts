@@ -23,16 +23,54 @@ export class AdvertService {
 
   currentTempId = '';
 
-  async addImage(advertImg: Express.Multer.File, tmpId: string, user: any, @Req() req, @Res() res, body: any) {
+  async addImage(tmpId: string, user: any, body: any) {
+    console.log("BODY : ", body);
 
-    const key: string = [tmpDir, tmpId, body.originalname].join("/");
+
+    const fname: string = body.originalname;
+    const ext = fname.split('.').pop();
+    const newFname = `${uuidv4()}.${ext}`;
+
+    const key: string = [tmpDir, tmpId, newFname].join("/");
+
+    console.log("extention : ", ext);
+
     const resUpload = await s3.putObject({
       Bucket: s3bucket,
       Key: key,
-      Body: new Buffer(body.advertImg, 'base64')
+      Body: Buffer.from(body.advertImg, 'base64')
     }).promise();
 
-    return resUpload;
+    console.log("After image safe", resUpload);
+
+    const created = new Date().toISOString();
+    const imgId = uuidv4();
+    const saveParams = {
+      pk: imgId,
+      sk: `IMG`,
+      userId: user.id,
+      createdAt: created,
+      group: `CATALOG#IMG`,
+      compKeyType: [
+        "IMG",
+        tmpId,
+        imgId
+      ].join("#"),
+      image: `${s3bucket}/${key}`,
+      url: `https://${s3bucket}.s3.af-south-1.amazonaws.com/${key}`
+
+    };
+    try {
+      await dynamodb.put({
+        TableName: process.env.CLASSIFY_TABLE,
+        Item: saveParams
+      }).promise();
+
+      return saveParams.url;
+    } catch (e) {
+      console.log("ERROR saving image", e);
+      return '';
+    }
   }
 
 

@@ -26,16 +26,15 @@ export class AdvertController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(FileInterceptor('advertImg' ))
+    @UseInterceptors(FileInterceptor('' ))
     @Post('addImage/:tmpId')
     async addImage(@Body() body: any,
                    @Param('tmpId') tmpId: string,
                    @Req() req,
-                   @Res() res: any,
-                   @UploadedFile() advertImg: Express.Multer.File){
+                   @Res() res: any){
 
         console.log("ADD IMAGE");
-        const newAdvert = await this.advertService.addImage(advertImg, tmpId, req.user, req, res, body);
+        const newAdvert = await this.advertService.addImage(tmpId, req.user, body);
         return res.status(HttpStatus.OK).json({ok: true, result: newAdvert});
     }
 
