@@ -6,6 +6,9 @@ provider:
   region: af-south-1
   stage: ${opt:stage, 'dev'}
   profile: classifydepl
+  apiGateway:
+    binaryMediaTypes:
+      - 'multipart/form-data'
   environment:
     CLASSIFY_TABLE: ${self:custom.ClassifyTable.name}
     CLASSIFY_S3: ${self:custom.ClassifyS3.name}
@@ -29,6 +32,8 @@ resources:
   Resources:
     ClassifyTable: ${file(resources/ClassifyTable.yml):ClassifyTable}
     AttachmentsBucket: ${file(resources/ClassifyS3Bucket.yml):AttachmentsBucket}
+    SQSAdvertindex: ${file(resources/ClassifySQSAdvertindex.yml):SQSAdvertindex}
+    SQSAdvertindexDeadLetter: ${file(resources/ClassifySQSAdvertindex.yml):SQSAdvertindexDeadLetter}
 
 functions:
   index:
@@ -50,3 +55,9 @@ custom:
   ClassifyS3:
     arn: !GetAtt AttachmentsBucket.Arn
     name: !Ref AttachmentsBucket
+  SQSAdvertindex:
+    arn: !GetAtt SQSAdvertindex.Arn
+    name: !Ref SQSAdvertindex
+  SQSAdvertindexDeadLetter:
+    arn: !GetAtt SQSAdvertindexDeadLetter.Arn
+    name: !Ref SQSAdvertindexDeadLetter

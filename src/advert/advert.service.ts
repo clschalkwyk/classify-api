@@ -2,75 +2,110 @@ import {Injectable, InternalServerErrorException, NotFoundException, Req, Res} f
 import {v4 as uuidv4} from 'uuid';
 import * as AWS from 'aws-sdk';
 import {NewAdvertDto} from './dto/newAdvert.dto';
-import {NewImageDto} from "./dto/newImage.dto";
-import * as multer from 'multer';
-import * as multers3 from 'multer-s3';
-import {tmpdir} from "os";
+
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
-// const s3bucket = 'dev-classify-coza-images-202009061338';
-// const s3bucket = 'classify-api-dev-attachmentsbucket-hyqj0x8gcafv';
 const s3bucket = process.env.CLASSIFY_S3;
-const tmpDir = 'temp';
+
 const s3 = new AWS.S3();
 
 
 @Injectable()
 export class AdvertService {
-  parseIncoming(incoming: string) {
-
-  }
 
   currentTempId = '';
 
-  async addImage(tmpId: string, user: any, body: any) {
-    console.log("BODY : ", body);
-
-
-    const fname: string = body.originalname;
-    const ext = fname.split('.').pop();
-    const newFname = `${uuidv4()}.${ext}`;
-
-    const key: string = [tmpDir, tmpId, newFname].join("/");
-
-    console.log("extention : ", ext);
-
-    const resUpload = await s3.putObject({
-      Bucket: s3bucket,
-      Key: key,
-      Body: Buffer.from(body.advertImg, 'base64')
-    }).promise();
-
-    console.log("After image safe", resUpload);
-
-    const created = new Date().toISOString();
-    const imgId = uuidv4();
-    const saveParams = {
-      pk: imgId,
-      sk: `IMG`,
-      userId: user.id,
-      createdAt: created,
-      group: `CATALOG#IMG`,
-      compKeyType: [
-        "IMG",
-        tmpId,
-        imgId
-      ].join("#"),
-      image: `${s3bucket}/${key}`,
-      url: `https://${s3bucket}.s3.af-south-1.amazonaws.com/${key}`
-
-    };
+  async deleteTempImage(tmpId: string, id: string, user: any) {
     try {
-      await dynamodb.put({
+      const params = {
         TableName: process.env.CLASSIFY_TABLE,
-        Item: saveParams
-      }).promise();
+        Key: {
+          'pk': id,
+          'sk': 'IMG'
+        }
+      };
 
-      return saveParams.url;
+      const img = await dynamodb.get(params).promise();
+      if (
+        img.Item?.pk === id &&
+        img.Item?.group === tmpId &&
+        img.Item?.userId === user.id
+      ) {
+        // this is my image
+        const delResult = await dynamodb.delete({
+          TableName: process.env.CLASSIFY_TABLE,
+          Key: {
+            'pk': id,
+            'sk': 'IMG'
+          }
+        }).promise();
+
+        const resDelete = await s3.deleteObject({
+          Bucket: s3bucket,
+          Key: img.Item?.filekey,
+        }).promise();
+
+        return true;
+      }
+      return false;
     } catch (e) {
-      console.log("ERROR saving image", e);
-      return '';
+      throw new InternalServerErrorException(e)
     }
+  }
+
+  async getTempImages(tmpId: string, user: any) {
+    try {
+      const result = await dynamodb.query({
+        TableName: process.env.CLASSIFY_TABLE,
+        IndexName: 'compKeyTypeIdx',
+        KeyConditionExpression: '#group = :grp and begins_with(compKeyType, :begins)',
+
+        ExpressionAttributeNames: {'#rl': 'url', '#pos': 'position', '#group': 'group'},
+        ExpressionAttributeValues: {
+          ':grp': tmpId,
+          ':begins': ['IMG', tmpId].join('#')
+        },
+        ProjectionExpression: '#rl, #pos, pk'
+      }).promise();
+      return result.Items;
+    } catch (e) {
+      throw new InternalServerErrorException(e)
+    }
+  }
+
+  async addImage(tmpId: string, user: any, body: any, file: any) {
+
+    const res = Promise.all( file.map(async (ff) => {
+        const created = new Date().toISOString();
+        const imgId = uuidv4();
+        const saveParams = {
+          pk: imgId,
+          sk: `IMG`,
+          userId: user.id,
+          createdAt: created,
+          group: tmpId,
+          compKeyType: [
+            "IMG",
+            tmpId,
+            imgId
+          ].join("#"),
+          imageData: ff,
+          position: parseInt(body.position),
+          url: ff.location,
+          filename: ff.originalname,
+          filekey: ff.key
+        };
+        console.log("SAVING IMG", saveParams);
+
+        await dynamodb.put({
+          TableName: process.env.CLASSIFY_TABLE,
+          Item: saveParams
+        }).promise();
+
+        return saveParams.url;
+    }));
+
+    return res;
   }
 
 
@@ -83,6 +118,7 @@ export class AdvertService {
     const {province, city, suburb, street1, street2, postcode, country} = newAd;
     const {advertType, askingPrice, description, propertyType, stat, title, type} = newAd;
     const adId = uuidv4();
+
     return {
       pk: adId,
       sk: 'CATALOG',
