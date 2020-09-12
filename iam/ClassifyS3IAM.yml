@@ -1,0 +1,9 @@
+ClassifyS3IAM:
+  Effect: Allow
+  Action:
+    - s3:PutObject
+    - s3:PutObjectAcl
+    - s3:DeleteObject
+  Resource:
+    - arn:aws:s3:::classify-api-dev-attachmentsbucket-hyqj0x8gcafv
+    - arn:aws:s3:::classify-api-dev-attachmentsbucket-hyqj0x8gcafv/*

@@ -1,0 +1,31 @@
+SQSAdvertindex:
+  Type: "AWS::SQS::Queue"
+  Properties:
+    QueueName: Advertindex-${self:provider.stage}
+    RedrivePolicy:
+      deadLetterTargetArn:
+        Fn::GetAtt:
+          - SQSAdvertindexDeadLetter
+          - Arn
+      maxReceiveCount: 5
+
+SQSAdvertindexDeadLetter:
+  Type: "AWS::SQS::Queue"
+
+Outputs:
+  SQSAdvertindexURL:
+    Value:
+      Ref: SQSAdvertindex
+  SQSAdvertindexArn:
+    Value:
+      Fn::GetAtt:
+        - SQSAdvertindex
+        - Arn
+  SQSAdvertindexDeadLetterURL:
+    Value:
+      Ref: SQSAdvertindexDeadLetter
+  SQSAdvertindexDeadLetterArn:
+    Value:
+      Fn::GetAtt:
+        - SQSAdvertindexDeadLetter
+        - Arn
