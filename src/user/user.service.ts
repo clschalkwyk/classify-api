@@ -3,6 +3,9 @@ import * as AWS from 'aws-sdk';
 import {UserUpdateDto} from "./dto/updateUser.dto";
 import {toHash as toHashCrypt} from "../lib/Crypt";
 
+const {IS_OFFLINE} = process.env;
+const CLASSIFY_TABLE_NAME = (IS_OFFLINE === 'true' ? 'ClassifyTable-dev' : process.env.CLASSIFY_TABLE);
+
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 @Injectable()
@@ -10,7 +13,7 @@ export class UserService {
 
     async getUser(userId: string){
         const result = await dynamodb.query({
-            TableName: process.env.CLASSIFY_TABLE,
+            TableName: CLASSIFY_TABLE_NAME,
             KeyConditionExpression: 'pk = :userId and sk = :sk',
             ExpressionAttributeValues:{
                 ':userId': userId,
@@ -32,7 +35,7 @@ export class UserService {
             newPass = await toHashCrypt(updateUser.newpass);
 
             const res1 = await dynamodb.update({
-                TableName: process.env.CLASSIFY_TABLE,
+                TableName: CLASSIFY_TABLE_NAME,
                 Key:{
                     'pk': userId,
                     'sk': 'AUTH'
@@ -46,7 +49,7 @@ export class UserService {
         }
 
         const res = await dynamodb.update({
-            TableName: process.env.CLASSIFY_TABLE,
+            TableName: CLASSIFY_TABLE_NAME,
             Key:{
                 'pk': userId,
                 'sk': 'AUTH'

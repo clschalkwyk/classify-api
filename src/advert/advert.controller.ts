@@ -1,4 +1,4 @@
-import {Controller, UseGuards, Post, Get, Delete, Body, Request, Param, Res, Req, HttpStatus, UseInterceptors, UploadedFiles} from '@nestjs/common';
+import {Controller, UseGuards, Post, Get, Delete, Query, Body, Request, Param, Res, Req, HttpStatus, UseInterceptors, UploadedFiles} from '@nestjs/common';
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {AdvertService} from "./advert.service";
 import {NewAdvertDto} from "./dto/newAdvert.dto";
@@ -72,5 +72,18 @@ export class AdvertController {
   async viewAd(@Request() req, @Res() res: any, @Param('id') id: string) {
     const advert = await this.advertService.getAd(id);
     return res.status(HttpStatus.OK).json(advert);
+  }
+
+  @Get('list')
+  async listAds(
+    @Request() req,
+    @Res() res,
+    @Query('country') country: string,
+    @Query('advertType') advertType: string,
+    @Query('province') province: string,
+    @Query('suburb') suburb: string,
+  ){
+    const found = await this.advertService.list(advertType, country, province, suburb);
+    return res.status(HttpStatus.OK).json(found);
   }
 }

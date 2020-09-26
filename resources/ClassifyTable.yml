@@ -56,3 +56,19 @@ ClassifyTable:
             KeyType: RANGE
         Projection:
           ProjectionType: ALL
+      - IndexName: advertCatalogIdx
+        KeySchema:
+          - AttributeName: sk
+            KeyType: HASH
+          - AttributeName: compKeyLocation
+            KeyType: RANGE
+        Projection:
+          ProjectionType: ALL
+      - IndexName: reverseIndexIdx
+        KeySchema:
+          - AttributeName: sk
+            KeyType: HASH
+          - AttributeName: pk
+            KeyType: RANGE
+        Projection:
+          ProjectionType: ALL

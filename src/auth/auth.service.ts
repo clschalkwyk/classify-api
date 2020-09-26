@@ -1,7 +1,5 @@
 import {Injectable, InternalServerErrorException} from '@nestjs/common';
 import {JwtService} from "@nestjs/jwt";
-//import {scrypt, randomBytes} from "crypto";
-import {promisify} from "util";
 import {CreateUserDto} from "./dto/createUser.dto";
 import * as AWS from 'aws-sdk';
 import {v4 as uuidv4} from 'uuid';
@@ -9,6 +7,10 @@ import {toHash as toHashCrypt, compare as compareCrypt} from "../lib/Crypt";
 
 //const scryptAsync = promisify(scrypt);
 
+const {IS_OFFLINE} = process.env;
+const CLASSIFY_TABLE_NAME = (IS_OFFLINE === 'true' ? 'ClassifyTable-dev' : process.env.CLASSIFY_TABLE);
+
+console.log("IS OFFLINE: ", IS_OFFLINE);
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
@@ -17,6 +19,7 @@ export class AuthService {
     constructor(
         private jwtService: JwtService
     ) {
+        console.log(process.env);
     }
 
     async toHash(password: string) {
@@ -26,16 +29,16 @@ export class AuthService {
         return hashed;
     }
 
-    async compare(storedPassword: string, suppliedPassword: string) {
+    async compare(storedPassword: string, suppliedPassword: string) : Promise<boolean>{
 //        const [hashedPassword, salt] = storedPassword.split('.');
   //      const buf = (await scryptAsync(suppliedPassword, salt, 64)) as Buffer;
         const res = await compareCrypt(storedPassword, suppliedPassword);
-        return res;
+        return Promise.resolve(res);
     }
 
     async validateUser(email: string, pass: string): Promise<any> {
         const result = await dynamodb.query({
-            TableName: process.env.CLASSIFY_TABLE,
+            TableName: CLASSIFY_TABLE_NAME,
             IndexName: 'emailIdx',
             KeyConditionExpression: 'email = :email and sk = :sk',
             ExpressionAttributeValues:{
@@ -48,10 +51,10 @@ export class AuthService {
         if(password) {
             const passwordMatch = await this.compare(password, pass);
             if (passwordMatch) {
-                return {email: result?.Items[0].email, sub: result?.Items[0].pk};
+                return Promise.resolve({email: result?.Items[0].email, sub: result?.Items[0].pk});
             }
         }
-        return null;
+        return Promise.resolve(null);
     }
 
     async login(user: any) {
@@ -60,10 +63,10 @@ export class AuthService {
         return this.jwtService.sign(payload);
     }
 
-    async userExists(email: string){
+    async userExists(email: string): Promise<boolean>{
         try {
             const result = await dynamodb.query({
-                TableName: process.env.CLASSIFY_TABLE,
+                TableName: CLASSIFY_TABLE_NAME,
                 IndexName: 'emailIdx',
                 KeyConditionExpression: 'email = :email and sk = :sk',
                 ExpressionAttributeValues:{
@@ -73,11 +76,12 @@ export class AuthService {
             }).promise();
             const user = result?.Items[0];
 
-            return user?.email === email;
+            return Promise.resolve(user?.email === email);
         }catch(err){
             throw new InternalServerErrorException(err);
         }
-        return false;
+
+        return Promise.resolve(false);
     }
 
     async createUser(createUserDto: CreateUserDto) {
@@ -92,7 +96,7 @@ export class AuthService {
 
         try {
             await dynamodb.put({
-                TableName: process.env.CLASSIFY_TABLE,
+                TableName: CLASSIFY_TABLE_NAME,
                 Item: params
             }).promise();
         }catch (err) {
