@@ -86,4 +86,13 @@ export class AdvertController {
     const found = await this.advertService.list(advertType, country, province, suburb);
     return res.status(HttpStatus.OK).json(found);
   }
+
+  @Get('feed')
+  async feed(
+    @Res() res,
+    @Query('stat') stat
+  ){
+    const found = await this.advertService.getFeed(stat);
+    return res.status(HttpStatus.OK).json({'results': found});
+  }
 }

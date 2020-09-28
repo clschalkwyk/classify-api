@@ -13,17 +13,12 @@ const bootstrapServer = async (): Promise<Server> => {
   const adapter = new ExpressAdapter(expressApp);
   const app = await NestFactory.create(AppModule, adapter);
 
-//   app.enableCors({
-     // origin: true,
-     // preflightContinue: true
- //  });
    app.use((req, res, next) => {
      res.header('Access-Control-Allow-Origin', '*');
      res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
      next();
    });
-
 
   await app.init();
   return awsServerlessExpress.createServer(expressApp);

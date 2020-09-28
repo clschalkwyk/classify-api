@@ -295,12 +295,40 @@ export class AdvertService {
     }
   }
 
+  async getFeed(stat: string): Promise<any> {
+
+    if (stat === 'BY_PROV') {
+      const found = await dynamodb.query({
+        IndexName: 'reverseIndexIdx',
+        TableName: CLASSIFY_TABLE_NAME,
+        KeyConditionExpression: '#pk = :pk',
+        ExpressionAttributeNames: {'#pk': 'sk'},
+        ExpressionAttributeValues: {':pk': ['STATS', stat].join('#')}
+      }).promise();
+
+      let ids = found.Items.map((i) => {
+        return {'pk': i.pk, 'sk': 'CATALOG'};
+      });
+
+      const adlist = await dynamodb
+        .batchGet(
+          {
+            RequestItems: {
+              [CLASSIFY_TABLE_NAME]: {Keys: ids}
+            }
+          }
+        ).promise();
+
+      return Promise.resolve(adlist['Responses'][CLASSIFY_TABLE_NAME]);
+    }
+
+    return Promise.resolve({});
+  }
+
   async list(advertType: string, country: string, province: string, suburb: string): Promise<any> {
     try {
       console.log(`advertType ,  country , province , suburb`);
-
       country = 'ZA';
-
       let sk = [];
       sk.push('L');
       sk.push(country);

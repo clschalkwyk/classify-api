@@ -17,7 +17,6 @@ provider:
     - ${file(iam/ClassifyS3IAM.yml):ClassifyS3IAM}
 
 plugins:
-  - serverless-plugin-typescript
   - serverless-offline
 
 package:
@@ -38,7 +37,7 @@ resources:
 
 functions:
   index:
-    handler: src/index.handler
+    handler: dist/index.handler
     events:
     - http:
         cors: true
@@ -62,6 +61,6 @@ custom:
   SQSAdvertindexDeadLetter:
     arn: !GetAtt SQSAdvertindexDeadLetter.Arn
     name: !Ref SQSAdvertindexDeadLetter
-  serverless-offline:
-    httpPort: 4334
+#  serverless-offline:
+#    httpPort: 4334
 
