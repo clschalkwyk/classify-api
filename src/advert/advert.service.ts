@@ -297,7 +297,11 @@ export class AdvertService {
 
   async getFeed(stat: string): Promise<any> {
 
-    if (stat === 'BY_PROV') {
+    if (
+      stat === 'BY_PROV' ||
+      stat === 'BY_ADT_PT' ||
+      stat === 'BY_PROV_PT'
+    ) {
       const found = await dynamodb.query({
         IndexName: 'reverseIndexIdx',
         TableName: CLASSIFY_TABLE_NAME,
