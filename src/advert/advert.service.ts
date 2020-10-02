@@ -286,7 +286,7 @@ export class AdvertService {
           ':pk': id,
           ':sk': 'CATALOG'
         },
-        ProjectionExpression: 'advertType,createdAt,address,stat,description,pk,title, #typ',
+        ProjectionExpression: 'advertType,createdAt,askingPrice,address,stat,description,pk,title, #typ',
         ExpressionAttributeNames: {'#typ': 'type'}
       }).promise();
       return result.Items[0];
