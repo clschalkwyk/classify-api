@@ -74,18 +74,29 @@ export class AdvertController {
     return res.status(HttpStatus.OK).json(advert);
   }
 
-  @Get('list')
+  @Get('list/location')
   async listAds(
     @Request() req,
     @Res() res,
     @Query('country') country: string,
-    @Query('advertType') advertType: string,
     @Query('province') province: string,
     @Query('suburb') suburb: string,
   ){
-    const found = await this.advertService.list(advertType, country, province, suburb);
+    const found = await this.advertService.listByLocation(country, province, suburb);
     return res.status(HttpStatus.OK).json(found);
   }
+
+  @Get('list/ad-type')
+  async listAdType(
+    @Request() req,
+    @Res() res,
+    @Query('adType') adType: string,
+    @Query('propType') propType: string,
+  ){
+    const found = await this.advertService.listByAdvertType(adType, propType);
+    return res.status(HttpStatus.OK).json(found);
+  }
+
 
   @Get('feed')
   async feed(

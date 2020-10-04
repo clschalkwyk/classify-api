@@ -2,7 +2,11 @@ export declare class NewAdvertDto {
     type: string;
     description: string;
     askingPrice: number;
-    stat: object;
+    stat: {
+        count: object;
+        has: object;
+        size: object;
+    };
     street1: string;
     street2: string;
     suburb: string;

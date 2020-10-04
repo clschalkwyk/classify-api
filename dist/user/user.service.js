@@ -10,11 +10,13 @@ exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
 const AWS = require("aws-sdk");
 const Crypt_1 = require("../lib/Crypt");
+const { IS_OFFLINE } = process.env;
+const CLASSIFY_TABLE_NAME = (IS_OFFLINE === 'true' ? 'ClassifyTable-dev' : process.env.CLASSIFY_TABLE);
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 let UserService = class UserService {
     async getUser(userId) {
         const result = await dynamodb.query({
-            TableName: process.env.CLASSIFY_TABLE,
+            TableName: CLASSIFY_TABLE_NAME,
             KeyConditionExpression: 'pk = :userId and sk = :sk',
             ExpressionAttributeValues: {
                 ':userId': userId,
@@ -32,7 +34,7 @@ let UserService = class UserService {
             (updateUser.newpass === updateUser.confirmpass)) {
             newPass = await Crypt_1.toHash(updateUser.newpass);
             const res1 = await dynamodb.update({
-                TableName: process.env.CLASSIFY_TABLE,
+                TableName: CLASSIFY_TABLE_NAME,
                 Key: {
                     'pk': userId,
                     'sk': 'AUTH'
@@ -45,7 +47,7 @@ let UserService = class UserService {
             }).promise();
         }
         const res = await dynamodb.update({
-            TableName: process.env.CLASSIFY_TABLE,
+            TableName: CLASSIFY_TABLE_NAME,
             Key: {
                 'pk': userId,
                 'sk': 'AUTH'

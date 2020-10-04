@@ -2,8 +2,11 @@ import {Injectable, InternalServerErrorException, NotFoundException, Req, Res} f
 import {v4 as uuidv4} from 'uuid';
 import * as AWS from 'aws-sdk';
 import {NewAdvertDto} from './dto/newAdvert.dto';
-import {BatchWriteItemInput} from "aws-sdk/clients/dynamodb";
 
+
+
+const propertyTypes = ['House', 'Apartment', 'Townhouse', 'Plot', 'Farm', 'Commercial Building', 'Industrial'];
+const advertTypes = ['For Sale', 'To Rent'];
 
 const {IS_OFFLINE} = process.env;
 const CLASSIFY_TABLE_NAME = (IS_OFFLINE === 'true' ? 'ClassifyTable-dev' : process.env.CLASSIFY_TABLE);
@@ -289,7 +292,18 @@ export class AdvertService {
         ProjectionExpression: 'advertType,createdAt,askingPrice,address,stat,description,pk,title, #typ',
         ExpressionAttributeNames: {'#typ': 'type'}
       }).promise();
-      return result.Items[0];
+
+      const resultGeo = await dynamodb.query({
+        TableName: CLASSIFY_TABLE_NAME,
+        KeyConditionExpression: 'pk = :pk and sk = :sk',
+        ExpressionAttributeValues: {
+          ':pk': id,
+          ':sk': 'GEO'
+        }
+      }).promise();
+
+      const res = {...result.Items[0], geo: resultGeo.Items[0]['data'][0]['geometry']['location']};
+      return res;
     } catch (e) {
       throw new NotFoundException(e);
     }
@@ -329,13 +343,13 @@ export class AdvertService {
     return Promise.resolve({});
   }
 
-  async list(advertType: string, country: string, province: string, suburb: string): Promise<any> {
+  async listByLocation(country: string, province: string, suburb: string): Promise<any> {
     try {
-      console.log(`advertType ,  country , province , suburb`);
       country = 'ZA';
       let sk = [];
       sk.push('L');
       sk.push(country);
+
       if (province) {
         sk.push(province);
         if (suburb) {
@@ -346,44 +360,62 @@ export class AdvertService {
       let pk = [];
       pk.push('CATALOG');
       let found;
-      if (advertType) {
-        pk.push(advertType);
+      found = await dynamodb.query({
+        TableName: CLASSIFY_TABLE_NAME,
+        IndexName: 'advertCatalogIdx',
+        KeyConditionExpression: '#pk = :pk and begins_with(#sk , :sk)',
+        ExpressionAttributeNames: {
+          '#pk': 'sk',
+          '#sk': 'compKeyLocation',
+        },
+        ExpressionAttributeValues: {
+          ':pk': pk.join('#'),
+          ':sk': sk.join('#')
+        },
+        // ProjectionExpression: 'advertType,createdAt,address,stat,description,pk,title, #typ',
+      }).promise();
 
-        found = await dynamodb.query({
-          TableName: CLASSIFY_TABLE_NAME,
-          IndexName: 'compKeyLocationIdx',
-          KeyConditionExpression: '#pk = :pk and begins_with(#sk , :sk)',
-          ExpressionAttributeNames: {
-            '#pk': 'group',
-            '#sk': 'compKeyLocation',
-          },
-          ExpressionAttributeValues: {
-            ':pk': pk.join('#'),
-            ':sk': sk.join('#')
-          },
-          // ProjectionExpression: 'advertType,createdAt,address,stat,description,pk,title, #typ',
+      return Promise.resolve(found.Items);
+    } catch (e) {
+      throw new InternalServerErrorException(e)
+    }
+  }
 
-        }).promise();
+  async listByAdvertType(adType: string, propType: string): Promise<any> {
+    try {
 
-      } else {
-        found = await dynamodb.query({
-          TableName: CLASSIFY_TABLE_NAME,
-          IndexName: 'advertCatalogIdx',
-          KeyConditionExpression: '#pk = :pk and begins_with(#sk , :sk)',
-          ExpressionAttributeNames: {
-            '#pk': 'sk',
-            '#sk': 'compKeyLocation',
-          },
-          ExpressionAttributeValues: {
-            ':pk': pk.join('#'),
-            ':sk': sk.join('#')
-          },
-          // ProjectionExpression: 'advertType,createdAt,address,stat,description,pk,title, #typ',
 
-        }).promise();
-
+      let pk = [];
+      pk.push('CATALOG');
+      if (propType &&  propertyTypes.indexOf(propType) > -1 ) {
+        pk.push(propType);
+      }else{
+        pk.push(propertyTypes[0]);
       }
 
+      let sk = [];
+      sk.push('T');
+      if(adType && advertTypes.indexOf(adType) > -1){
+        sk.push(adType)
+      }else{
+        sk.push(advertTypes[0]);
+      }
+
+      let found;
+      found = await dynamodb.query({
+        TableName: CLASSIFY_TABLE_NAME,
+        IndexName: 'compKeyTypeIdx',
+        KeyConditionExpression: '#pk = :pk and begins_with(#sk , :sk)',
+        ExpressionAttributeNames: {
+          '#pk': 'group',
+          '#sk': 'compKeyType',
+        },
+        ExpressionAttributeValues: {
+          ':pk': pk.join('#'),
+          ':sk': sk.join('#')
+        },
+        // ProjectionExpression: 'advertType,createdAt,address,stat,description,pk,title, #typ',
+      }).promise();
 
       return Promise.resolve(found.Items);
     } catch (e) {

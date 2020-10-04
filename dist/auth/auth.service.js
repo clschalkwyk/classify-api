@@ -15,10 +15,14 @@ const jwt_1 = require("@nestjs/jwt");
 const AWS = require("aws-sdk");
 const uuid_1 = require("uuid");
 const Crypt_1 = require("../lib/Crypt");
+const { IS_OFFLINE } = process.env;
+const CLASSIFY_TABLE_NAME = (IS_OFFLINE === 'true' ? 'ClassifyTable-dev' : process.env.CLASSIFY_TABLE);
+console.log("IS OFFLINE: ", IS_OFFLINE);
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 let AuthService = class AuthService {
     constructor(jwtService) {
         this.jwtService = jwtService;
+        console.log(process.env);
     }
     async toHash(password) {
         const hashed = await Crypt_1.toHash(password);
@@ -26,11 +30,11 @@ let AuthService = class AuthService {
     }
     async compare(storedPassword, suppliedPassword) {
         const res = await Crypt_1.compare(storedPassword, suppliedPassword);
-        return res;
+        return Promise.resolve(res);
     }
     async validateUser(email, pass) {
         const result = await dynamodb.query({
-            TableName: process.env.CLASSIFY_TABLE,
+            TableName: CLASSIFY_TABLE_NAME,
             IndexName: 'emailIdx',
             KeyConditionExpression: 'email = :email and sk = :sk',
             ExpressionAttributeValues: {
@@ -42,10 +46,10 @@ let AuthService = class AuthService {
         if (password) {
             const passwordMatch = await this.compare(password, pass);
             if (passwordMatch) {
-                return { email: result === null || result === void 0 ? void 0 : result.Items[0].email, sub: result === null || result === void 0 ? void 0 : result.Items[0].pk };
+                return Promise.resolve({ email: result === null || result === void 0 ? void 0 : result.Items[0].email, sub: result === null || result === void 0 ? void 0 : result.Items[0].pk });
             }
         }
-        return null;
+        return Promise.resolve(null);
     }
     async login(user) {
         const payload = { email: user.email, sub: user.sub };
@@ -55,7 +59,7 @@ let AuthService = class AuthService {
     async userExists(email) {
         try {
             const result = await dynamodb.query({
-                TableName: process.env.CLASSIFY_TABLE,
+                TableName: CLASSIFY_TABLE_NAME,
                 IndexName: 'emailIdx',
                 KeyConditionExpression: 'email = :email and sk = :sk',
                 ExpressionAttributeValues: {
@@ -64,12 +68,12 @@ let AuthService = class AuthService {
                 }
             }).promise();
             const user = result === null || result === void 0 ? void 0 : result.Items[0];
-            return (user === null || user === void 0 ? void 0 : user.email) === email;
+            return Promise.resolve((user === null || user === void 0 ? void 0 : user.email) === email);
         }
         catch (err) {
             throw new common_1.InternalServerErrorException(err);
         }
-        return false;
+        return Promise.resolve(false);
     }
     async createUser(createUserDto) {
         const { email, password } = createUserDto;
@@ -82,7 +86,7 @@ let AuthService = class AuthService {
         };
         try {
             await dynamodb.put({
-                TableName: process.env.CLASSIFY_TABLE,
+                TableName: CLASSIFY_TABLE_NAME,
                 Item: params
             }).promise();
         }

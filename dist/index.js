@@ -11,7 +11,12 @@ const bootstrapServer = async () => {
     const expressApp = express();
     const adapter = new platform_express_1.ExpressAdapter(expressApp);
     const app = await core_1.NestFactory.create(app_module_1.AppModule, adapter);
-    app.enableCors();
+    app.use((req, res, next) => {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+        next();
+    });
     await app.init();
     return awsServerlessExpress.createServer(expressApp);
 };

@@ -15,3 +15,4 @@ ClassifyTableIAM:
     - !Join ['/', ['${self:custom.ClassifyTable.arn}', 'index', 'compKeyTypeIdx']]
     - !Join ['/', ['${self:custom.ClassifyTable.arn}', 'index', 'userContentIdx']]
     - !Join ['/', ['${self:custom.ClassifyTable.arn}', 'index', 'reverseIndexIdx']]
+    - !Join ['/', ['${self:custom.ClassifyTable.arn}', 'index', 'advertCatalogIdx']]

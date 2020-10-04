@@ -1,57 +1,18 @@
 import * as AWS from 'aws-sdk';
 import { NewAdvertDto } from './dto/newAdvert.dto';
 export declare class AdvertService {
-    parseIncoming(incoming: string): void;
-    reformatNewAd(newAd: NewAdvertDto, user: any): {
-        pk: any;
-        sk: string;
-        userId: any;
-        createdAt: string;
-        group: string;
-        compKeyType: string;
-        compKeyLocation: string;
-        address: {
-            province: string;
-            city: string;
-            suburb: string;
-            street1: string;
-            street2: string;
-            postcode: string;
-            country: string;
-        };
-        advertType: string;
-        askingPrice: number;
-        description: string;
-        propertyType: string;
-        stat: object;
-        title: string;
-        type: string;
-    };
-    createAd(newAd: NewAdvertDto, user: any): Promise<{
-        pk: any;
-        sk: string;
-        userId: any;
-        createdAt: string;
-        group: string;
-        compKeyType: string;
-        compKeyLocation: string;
-        address: {
-            province: string;
-            city: string;
-            suburb: string;
-            street1: string;
-            street2: string;
-            postcode: string;
-            country: string;
-        };
-        advertType: string;
-        askingPrice: number;
-        description: string;
-        propertyType: string;
-        stat: object;
-        title: string;
-        type: string;
-    }>;
+    currentTempId: string;
+    deleteTempImage(tmpId: string, id: string, user: any): Promise<boolean>;
+    getTempImages(tmpId: string, user: any): Promise<AWS.DynamoDB.DocumentClient.ItemList>;
+    addImage(tmpId: string, user: any, body: any, file: any): Promise<[unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown]>;
+    indexAdvert(newAd: NewAdvertDto, user: any): Promise<void>;
+    reformatNewAd(newAd: NewAdvertDto, user: any): object;
+    createAd(newAd: NewAdvertDto, user: any): Promise<any>;
     userAds(user: any): Promise<AWS.DynamoDB.DocumentClient.ItemList>;
-    getAd(id: string): Promise<AWS.DynamoDB.DocumentClient.AttributeMap>;
+    getAd(id: string): Promise<{
+        geo: any;
+    }>;
+    getFeed(stat: string): Promise<any>;
+    listByLocation(country: string, province: string, suburb: string): Promise<any>;
+    listByAdvertType(adType: string, propType: string): Promise<any>;
 }
