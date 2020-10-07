@@ -210,15 +210,6 @@ export class AdvertService {
       createdAt: created,
       ...stat.size
     };
-    //
-    // return {
-    //   main: ad_main,
-    //   address: ad_address,
-    //   statCount: ad_stat_count,
-    //   statHas: ad_stat_has,
-    //   statSize: ad_stat_size,
-    // }
-
   }
 
   async createAd(newAd: NewAdvertDto, user: any) {
@@ -230,31 +221,40 @@ export class AdvertService {
         Item: newAdvert
       }).promise();
 
-      /*    let params: BatchWriteItemInput = {
-            RequestItems: {
-              [CLASSIFY_TABLE_NAME]: [
-                {
-                  PutRequest: {Item: newAdvert.main}
-                },
-                {
-                  PutRequest: {Item: newAdvert.address}
-                },
-                {
-                  PutRequest: {Item: newAdvert.statCount}
-                },
-                {
-                  PutRequest: {Item: newAdvert.statHas}
-                },
-                {
-                  PutRequest: {Item: newAdvert.statSize}
-                }
-              ]
-            }
-          };
-          await dynamodb.batchWrite(params).promise();
-    */
-      console.log("Added advert", JSON.stringify(newAdvert));
+      const images = await dynamodb.query({
+        TableName: CLASSIFY_TABLE_NAME,
+        IndexName: 'compKeyTypeIdx',
+        KeyConditionExpression: '#pk = :pk',
+        ExpressionAttributeNames: {
+          '#pk': 'group',
+        },
+        ExpressionAttributeValues: {
+          ':pk': newAd['tmpId']
+        },
+      }).promise();
 
+      let img;
+      for (const img1 of images.Items) {
+        var delParams = {
+          TableName:CLASSIFY_TABLE_NAME,
+          Key:{
+            "pk": img1.pk,
+            "sk": img1.sk
+          },
+        };
+
+        img1.sk = ['IMAGE', img1.pk].join('#')
+        img1.pk = newAdvert.pk;
+        img1.group = 'IMAGES';
+
+        await dynamodb.put({
+          TableName: CLASSIFY_TABLE_NAME,
+          Item: img1
+        }).promise();
+
+        //remove temp image
+        const rem = await dynamodb.delete(delParams).promise();
+      }
       return newAdvert;
     } catch (e) {
       throw  new InternalServerErrorException(e);
