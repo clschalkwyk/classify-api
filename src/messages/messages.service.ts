@@ -3,9 +3,8 @@ import {NewMessageDto} from "./dto/NewMessage.dto";
 import {v4 as uuid4}from 'uuid';
 import * as AWS from "aws-sdk";
 import MessageConfig from '../config/messages';
-
-const {IS_OFFLINE} = process.env;
-const CLASSIFY_TABLE_NAME = (IS_OFFLINE === 'true' ? 'ClassifyTable-dev' : process.env.CLASSIFY_TABLE);
+import Tablename from "../config/tablename";
+const CLASSIFY_TABLE_NAME = (new Tablename()).getName();
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 

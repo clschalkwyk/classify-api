@@ -2,14 +2,11 @@ import {Injectable, InternalServerErrorException, NotFoundException, Req, Res} f
 import {v4 as uuidv4} from 'uuid';
 import * as AWS from 'aws-sdk';
 import {NewAdvertDto} from './dto/newAdvert.dto';
-
-
+import Tablename from "../config/tablename";
+const CLASSIFY_TABLE_NAME = (new Tablename()).getName();
 
 const propertyTypes = ['House', 'Apartment', 'Townhouse', 'Plot', 'Farm', 'Commercial Building', 'Industrial'];
 const advertTypes = ['For Sale', 'To Rent'];
-
-const {IS_OFFLINE} = process.env;
-const CLASSIFY_TABLE_NAME = (IS_OFFLINE === 'true' ? 'ClassifyTable-dev' : process.env.CLASSIFY_TABLE);
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 const s3bucket = process.env.CLASSIFY_S3;
@@ -282,6 +279,7 @@ export class AdvertService {
 
   async getAd(id: string) {
     try {
+      console.log("Start Get Ad", id);
       const result = await dynamodb.query({
         TableName: CLASSIFY_TABLE_NAME,
         KeyConditionExpression: 'pk = :pk and sk = :sk',
@@ -292,6 +290,7 @@ export class AdvertService {
         ProjectionExpression: 'advertType,createdAt,askingPrice,address,stat,description,pk,title, #typ',
         ExpressionAttributeNames: {'#typ': 'type'}
       }).promise();
+      console.log("Start Get Ad : ", JSON.stringify(result));
 
       const resultGeo = await dynamodb.query({
         TableName: CLASSIFY_TABLE_NAME,
@@ -301,8 +300,58 @@ export class AdvertService {
           ':sk': 'GEO'
         }
       }).promise();
+      console.log("Start Get : ", JSON.stringify(resultGeo));
 
-      const res = {...result.Items[0], geo: resultGeo.Items[0]['data'][0]['geometry']['location']};
+      const resultImages = await dynamodb.query({
+        TableName: CLASSIFY_TABLE_NAME,
+        KeyConditionExpression: 'pk = :pk and begins_with(sk,:sk)',
+        ExpressionAttributeValues: {
+          ':pk': id,
+          ':sk': 'IMAGE#'
+        },
+        ProjectionExpression: '#pos,imageData.#loc',
+        ExpressionAttributeNames: {'#pos': 'position', '#loc':'location'}
+
+      }).promise();
+
+      console.log("Get Images : ", JSON.stringify(resultImages));
+
+
+      if(!Array.isArray(result.Items[0].stat.count)) {
+        console.log("Converting to Array", result.Items[0].stat.count);
+        const statCount = Object.keys(result.Items[0].stat.count).map((k) => {
+          return {[k]: result.Items[0].stat.count[k]}
+        });
+        result.Items[0].stat.count = statCount;
+      }
+
+      if(!Array.isArray(result.Items[0].stat.has)) {
+        const statHas = Object.keys(result.Items[0].stat.has).map((k) => {
+          return {[k]: result.Items[0].stat.has[k]}
+        });
+        result.Items[0].stat.has = statHas;
+      }
+
+      if(!Array.isArray(result.Items[0].stat.size)) {
+        const statSize = Object.keys(result.Items[0].stat.size).map((k) => {
+          return {[k]: result.Items[0].stat.size[k]}
+        });
+        result.Items[0].stat.size = statSize;
+      }
+
+      let res = {};
+      if(resultGeo && resultGeo.Items.length > 0){
+         res = {...result.Items[0], geo: resultGeo?.Items[0]['data'][0]['geometry']['location']};
+      }else{
+         res = {...result.Items[0], geo: {}};
+      }
+
+      if(resultImages.Items.length > 0){
+        res['images'] = resultImages.Items.map((img) => {
+          return {url: img.imageData.location, position: img.position}
+        });
+      }
+
       return res;
     } catch (e) {
       throw new NotFoundException(e);

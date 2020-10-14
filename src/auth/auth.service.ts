@@ -4,13 +4,10 @@ import {CreateUserDto} from "./dto/createUser.dto";
 import * as AWS from 'aws-sdk';
 import {v4 as uuidv4} from 'uuid';
 import {toHash as toHashCrypt, compare as compareCrypt} from "../lib/Crypt";
+import Tablename from "../config/tablename";
+const CLASSIFY_TABLE_NAME = (new Tablename()).getName();
 
 //const scryptAsync = promisify(scrypt);
-
-const {IS_OFFLINE} = process.env;
-const CLASSIFY_TABLE_NAME = (IS_OFFLINE === 'true' ? 'ClassifyTable-dev' : process.env.CLASSIFY_TABLE);
-
-console.log("IS OFFLINE: ", IS_OFFLINE);
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 

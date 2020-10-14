@@ -2,9 +2,8 @@ import {Inject, Injectable} from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import {UserUpdateDto} from "./dto/updateUser.dto";
 import {toHash as toHashCrypt} from "../lib/Crypt";
-
-const {IS_OFFLINE} = process.env;
-const CLASSIFY_TABLE_NAME = (IS_OFFLINE === 'true' ? 'ClassifyTable-dev' : process.env.CLASSIFY_TABLE);
+import Tablename from "../config/tablename";
+const CLASSIFY_TABLE_NAME = (new Tablename()).getName();
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 

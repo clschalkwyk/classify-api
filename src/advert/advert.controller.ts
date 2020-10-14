@@ -70,6 +70,7 @@ export class AdvertController {
 
   @Get('view/:id')
   async viewAd(@Request() req, @Res() res: any, @Param('id') id: string) {
+    console.log("View Ad : ", id);
     const advert = await this.advertService.getAd(id);
     return res.status(HttpStatus.OK).json(advert);
   }
