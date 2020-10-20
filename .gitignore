@@ -12,3 +12,5 @@ jspm_packages
 secret.pem
 
 .idea
+
+dist
